@@ -2,15 +2,12 @@
  * @file main.cpp
  * @author Ethan Sims (ea.sims@me.com)
  * @brief handles command-line arguments and starts game
- * @version 0.1
- * @date 2023-02-16
  */
 
 #include <stdio.h>
 #include <fstream>
 
 using namespace std;
-
 
 /**
  * @brief runs interactive mode of program (human and computer take turns)
@@ -20,9 +17,10 @@ using namespace std;
  * @param humanNext boolean value denoting if it is the human's turn
  */
 void runInteractive(ifstream &inputFile, const int DEPTH, bool humanNext) {
-   
-}
+   if(!humanNext) {
 
+   }
+}
 
 /**
  * @brief entry point for program
@@ -57,7 +55,7 @@ int main(int argc, char* argv[]) {
    }
 
    if (argv[1] == "interactive") { // run interactive mode
-      runInteractive(inputFile, (int) argv[4], argv[3] == "human-next");
+      runInteractive(inputFile, sscanf(argv[4], "%d"), argv[3] == "human-next");
    } else { // run one-move mode
 
    }
