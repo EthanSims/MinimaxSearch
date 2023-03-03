@@ -42,7 +42,7 @@ GameBoard::GameBoard(ifstream &input) {
    this->scores[0] = 0;
    this->scores[1] = 0;
 
-   getScores();
+   calcScores();
 }
 
 /**
@@ -73,14 +73,14 @@ int GameBoard::getNumPieces() {
 /**
  * @brief gets the scores for red and green (scores[0] is red, scores[1] is green)
  */
-void GameBoard::getScores() {
+void GameBoard::calcScores() {
    Pieces currPiece = Pieces::NONE;
    int numInRow;
 
    // get horizontal scores
    for (int row = 0 ; row < NUM_ROWS ; row++) {
       for (int col = 0 ; col < NUM_COLS ; col++) {
-         numInRow = getScoresHelper(row, col, numInRow, currPiece);
+         numInRow = calcScoresHelper(row, col, numInRow, currPiece);
          if (col >= NUM_COLS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
@@ -90,7 +90,7 @@ void GameBoard::getScores() {
    // get vertical scores
    for (int col = 0 ; col < NUM_COLS ; col++) {
       for (int row = 0 ; row < NUM_ROWS ; row++) {
-         numInRow = getScoresHelper(row, col, numInRow, currPiece);
+         numInRow = calcScoresHelper(row, col, numInRow, currPiece);
          if (row >= NUM_ROWS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
@@ -103,7 +103,7 @@ void GameBoard::getScores() {
          int row = col + i;
          if (row < 0) continue;
 
-         numInRow = getScoresHelper(row, col, numInRow, currPiece);
+         numInRow = calcScoresHelper(row, col, numInRow, currPiece);
          if ((row >= NUM_ROWS - 4 || col >= NUM_COLS - 4) && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
@@ -116,7 +116,7 @@ void GameBoard::getScores() {
          int row = i - col;
          if (row < 0) continue;
 
-         numInRow = getScoresHelper(row, col, numInRow, currPiece);
+         numInRow = calcScoresHelper(row, col, numInRow, currPiece);
          if ((row >= NUM_ROWS - 4 || col >= NUM_COLS - 4) && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
@@ -133,7 +133,7 @@ void GameBoard::getScores() {
  * @param prevPiece previous piece
  * @return int value of numInRow after function completes
  */
-int GameBoard::getScoresHelper(int row, int column, int numInRow, Pieces& prevPiece) {
+int GameBoard::calcScoresHelper(int row, int column, int numInRow, Pieces& prevPiece) {
    Pieces currPiece = this->columns[row].at(column);
    if (currPiece != Pieces::NONE && currPiece == prevPiece) { // there are at least 2 pieces in a row
       numInRow++;
@@ -169,4 +169,8 @@ void GameBoard::printBoard() {
       }
       cout << '\n';
    }
+}
+
+int* GameBoard::getScores() {
+   return this->scores;
 }

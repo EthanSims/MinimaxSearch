@@ -25,8 +25,8 @@ class GameBoard {
       bool redNext;
       int scores[2];
 
-      void getScores();
-      int getScoresHelper(int, int, int, Pieces&);
+      void calcScores();
+      int calcScoresHelper(int, int, int, Pieces&);
    public:
       GameBoard(ifstream&);
 
@@ -35,6 +35,8 @@ class GameBoard {
       int getNumPieces();
 
       void printBoard();
+
+      int* getScores();
 };
 
 #endif
