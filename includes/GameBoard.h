@@ -27,6 +27,7 @@ class GameBoard {
 
       void calcScores();
       void calcScoresHelper(int, int, int&, Pieces&, bool);
+      void GameBoard::insertPiece(Pieces, int);
    public:
       GameBoard(ifstream&);
 
@@ -37,6 +38,10 @@ class GameBoard {
       void printBoard();
 
       int* getScores();
+
+      void getUserMove();
+
+      void getComputerMove();
 };
 
 #endif

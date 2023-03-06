@@ -6,6 +6,7 @@
 #include "../includes/GameBoard.h"
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -195,6 +196,58 @@ void GameBoard::printBoard() {
    }
 }
 
+/**
+ * @brief getter for scores
+ * 
+ * @return a 2-D array in which the 0th index is red's score and the 1st index is green's score
+ */
 int* GameBoard::getScores() {
    return this->scores;
+}
+
+/**
+ * @brief gets user input and performs their move
+ */
+void GameBoard::getUserMove() {
+   Pieces userPiece = Pieces::GREEN;
+   if (redNext) userPiece = Pieces::RED;
+
+   vector<int> moves = this->getAvailMoves();
+
+   // print prompt
+   cout << "The available moves are columns: ";
+   for (int move : moves) {
+      cout << move << " ";
+   }
+   cout << endl;
+
+   cout << "Please choose a move: ";
+
+   // handle user input
+   int userMove;
+   while (true) {
+      cin >> userMove;
+      if (find(moves.begin(), moves.end(), userMove) == moves.end()) { // not an option
+         cout << "Not an option. Please enter a valid move: ";
+      } else {
+         break;
+      }
+   }
+
+   this->insertPiece(userPiece, userMove);
+}
+
+/**
+ * @brief inserts piece into given column
+ * 
+ * @param piece piece to insert
+ * @param col column to insert to
+ */
+void GameBoard::insertPiece(Pieces piece, int col) {
+   for (int row = 0 ; row < NUM_ROWS ; row++) {
+      if (this->columns[col]->at(row) == Pieces::NONE) {
+         this->columns[col]->at(row) = piece;
+      }
+   }
+   redNext = !redNext;
 }
