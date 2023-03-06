@@ -194,6 +194,8 @@ void GameBoard::printBoard() {
       }
       cout << '\n';
    }
+
+   cout << "Moves made so far: " << this->numPieces << endl;
 }
 
 /**
@@ -250,4 +252,56 @@ void GameBoard::insertPiece(Pieces piece, int col) {
       }
    }
    redNext = !redNext;
+   numPieces++;
+}
+
+/**
+ * @brief calculates computer's best move using minimax and alpha beta pruning
+ */
+void GameBoard::getComputerMove() {
+   minimax(*this, true);
+}
+
+/**
+ * @brief implements the minimax algorithm
+ * 
+ * @param state current board state
+ * @param start boolean denoting whether this is the start of the search or not
+ * @return for all children, returns the best eval, for the parent, returns best move
+ */
+int GameBoard::minimax(GameBoard state, bool start) {
+   int bestMove = -1;
+   int bestEval;
+
+   if (state.numPieces == 42) {
+      state.calcScores();
+      return state.getScores()[0] - state.getScores()[1]; // red's score - green's score
+   }
+
+   if (state.redNext) { // maximization player
+      bestEval = -999; // it is not possible to have nearly this much negative score
+      for (int move : state.getAvailMoves()) {
+         GameBoard child = state;
+         child.insertPiece(Pieces::RED, move);
+         int eval = minimax(child, false);
+         if (eval > bestEval) {
+            bestMove = move;
+            bestEval = eval;
+         }
+      }
+   } else { // minimization player
+      bestEval = 999;
+      for (int move : state.getAvailMoves()) {
+         GameBoard child = state;
+         child.insertPiece(Pieces::RED, move);
+         int eval = minimax(child, false);
+         if (eval < bestEval) {
+            bestMove = move;
+            bestEval = eval;
+         }
+      }
+   }
+
+   if (start) return bestMove; // parent
+   else return bestEval; // children
 }

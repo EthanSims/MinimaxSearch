@@ -27,7 +27,8 @@ class GameBoard {
 
       void calcScores();
       void calcScoresHelper(int, int, int&, Pieces&, bool);
-      void GameBoard::insertPiece(Pieces, int);
+      void insertPiece(Pieces, int);
+      int minimax(GameBoard, bool);
    public:
       GameBoard(ifstream&);
 
