@@ -20,13 +20,13 @@ class GameBoard {
    private:
       const static int NUM_COLS = 7;
       const static int NUM_ROWS = 6;
-      vector<Pieces> columns[NUM_COLS];
+      vector<Pieces>* columns[NUM_COLS];
       int numPieces;
       bool redNext;
       int scores[2];
 
       void calcScores();
-      int calcScoresHelper(int, int, int, Pieces&);
+      void calcScoresHelper(int, int, int&, Pieces&, bool);
    public:
       GameBoard(ifstream&);
 
