@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <fstream>
+#include "../includes/GameBoard.h"
 
 using namespace std;
 
@@ -16,10 +17,18 @@ using namespace std;
  * @param DEPTH depth of search (how many moves ahead to look)
  * @param humanNext boolean value denoting if it is the human's turn
  */
-void runInteractive(ifstream &inputFile, const int DEPTH, bool humanNext) {
+void runInteractive(GameBoard board, bool humanNext) {
    if(!humanNext) {
 
    }
+}
+
+void runOneMove(GameBoard board, ofstream &outputFile) {
+   board.printBoard();
+   board.getComputerMove();
+   board.printBoard();
+   board.saveBoard(outputFile);
+   exit(0);
 }
 
 /**
@@ -36,31 +45,25 @@ int main(int argc, char* argv[]) {
       return -1;
    }
 
-   if (!(argv[1] == "interactive" || argv[1] == "one-move")) {
+   if (!(((string) argv[1]) == "interactive" || ((string) argv[1]) == "one-move")) {
       fprintf(stderr, "Unexpected argument given: %s", argv[1]);
       return -1;
    }
 
-   if (argv[1] == "interactive" && !(argv[3] == "computer-next" || argv[3] == "human-next")) {
+   if (((string) argv[1]) == "interactive" && !(((string) argv[3]) == "computer-next" || ((string) argv[3]) == "human-next")) {
       fprintf(stderr, "Unexpected argument given: %s", argv[3]);
       return -1;
    }
 
-   // open inputFile and test its existence
-   ifstream inputFile(argv[2], ifstream::in);
+   GameBoard board(argv[2], atoi(argv[4]));
 
-   if (!inputFile) {
-      fprintf(stderr, "Could not open file: %s", argv[2]);
-      return -1;
-   }
-
-   if (argv[1] == "interactive") { // run interactive mode
-      runInteractive(inputFile, sscanf(argv[4], "%d"), argv[3] == "human-next");
+   if (((string) argv[1]) == "interactive") { // run interactive mode
+      runInteractive(board, ((string) argv[3]) == "human-next");
    } else { // run one-move mode
-
+      // open outputFile and test its existence
+      ofstream outputFile(argv[3], ofstream::out);
+      runOneMove(board, outputFile);
    }
-
-   inputFile.close();
 
    return 0;
 }

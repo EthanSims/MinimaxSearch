@@ -20,7 +20,8 @@ class GameBoard {
    private:
       const static int NUM_COLS = 7;
       const static int NUM_ROWS = 6;
-      vector<Pieces>* columns[NUM_COLS];
+      int maxDepth;
+      Pieces columns[NUM_COLS][NUM_ROWS];
       int numPieces;
       bool redNext;
       int scores[2];
@@ -30,7 +31,9 @@ class GameBoard {
       void insertPiece(Pieces, int);
       int minimax(GameBoard, bool);
    public:
-      GameBoard(ifstream&);
+      GameBoard(string, int);
+
+      GameBoard(const GameBoard&);
 
       vector<int> getAvailMoves();
 
@@ -43,6 +46,8 @@ class GameBoard {
       void getUserMove();
 
       void getComputerMove();
+
+      void saveBoard(ofstream&);
 };
 
 #endif

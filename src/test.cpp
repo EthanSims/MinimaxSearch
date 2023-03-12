@@ -16,9 +16,7 @@ using namespace std;
  */
 int main() {
    // test setup 1
-   ifstream inputFile("input3.txt");
-   GameBoard board(inputFile);
-   inputFile.close();
+   GameBoard board("input3.txt", 1);
 
    // test scores
    // test red's score (vertical and diagonal up-right)
@@ -27,13 +25,13 @@ int main() {
    // test green's score (horizontal 5 and diagonal down-right 5)
    cout << "Expected: 4, Actual: " << board.getScores()[1] << endl;
 
-   inputFile.open("edgecases.txt");
-   GameBoard board2(inputFile);
-   inputFile.close();
+   board = GameBoard("edgecases.txt", 1);
 
    // test scores
    // test red's score (vertical and diagonal up-right)
-   cout << "Expected: 13, Actual: " << board2.getScores()[0] << endl;
+   cout << "Expected: 13, Actual: " << board.getScores()[0] << endl;
+
+   board = GameBoard("test2.txt", 1);
 
    return 0;
 }

@@ -15,15 +15,19 @@ using namespace std;
  * 
  * @param input filestream to read initial state from
  */
-GameBoard::GameBoard(ifstream &input) {
+GameBoard::GameBoard(string filename, int depth) {
+   ifstream input = ifstream(filename);
+
+   if (!input) {
+      fprintf(stderr, "Could not open file: %s", filename);
+      exit(-1);
+   }
+
+   this->maxDepth = depth;
+
    int currSlot;
    char currInput;
    this->numPieces = 0;
-
-   // create empty vectors
-   for (int column = 0 ; column < NUM_COLS ; column++) {
-      this->columns[column] = new vector<Pieces>(NUM_ROWS, Pieces::NONE);
-   }
 
    // get main board input
    for (int row = 0 ; row < NUM_ROWS ; row++) {
@@ -33,25 +37,43 @@ GameBoard::GameBoard(ifstream &input) {
          if (currInput == '\n') input.get(currInput);
          currSlot = currInput - '0';
          if (currSlot == 0) { // empty
-            continue;
+            this->columns[column][NUM_ROWS - 1 - row] = Pieces::NONE;
          } else if (currSlot == 1){ // red
-            this->columns[column]->at(NUM_ROWS - 1 - row) = Pieces::RED;
+            this->columns[column][NUM_ROWS - 1 - row] = Pieces::RED;
             this->numPieces++;
          } else { // green
-            this->columns[column]->at(NUM_ROWS - 1 - row) = Pieces::GREEN;
+            this->columns[column][NUM_ROWS - 1 - row] = Pieces::GREEN;
             this->numPieces++;
          }
       }
    }
 
    input >> currSlot;
-   this->redNext = (currSlot == '1'); // if last char is 1, red is next
+   this->redNext = (currSlot == 1); // if last char is 1, red is next
 
    // init scores to 0
    this->scores[0] = 0; // red score
    this->scores[1] = 0; // green score
 
    calcScores();
+}
+
+/**
+ * @brief Copy constructor
+ * 
+ * @param original board to copy
+ */
+GameBoard::GameBoard(const GameBoard& original) {
+   this->maxDepth = original.maxDepth;
+   for (int i = 0 ; i < NUM_COLS ; i++) {
+      for (int j = 0 ; j < NUM_ROWS ; j++) {
+         this->columns[i][j] = original.columns[i][j];
+      }
+   }
+   this->numPieces = original.numPieces;
+   this->redNext = original.redNext;
+   this->scores[0] = original.scores[0];
+   this->scores[1] = original.scores[1];
 }
 
 /**
@@ -62,7 +84,7 @@ GameBoard::GameBoard(ifstream &input) {
 vector<int> GameBoard::getAvailMoves() {
    vector<int> moves;
    for (int column = 0 ; column < NUM_COLS ; column++) {
-      if (this->columns[column]->size() < NUM_ROWS) {
+      if (this->columns[column][NUM_ROWS - 1] == Pieces::NONE) {
          moves.push_back(column);
       }
    }
@@ -94,7 +116,7 @@ void GameBoard::calcScores() {
       for (int col = 0 ; col < NUM_COLS ; col++) {
          if (col == NUM_COLS - 1) last = true;
          calcScoresHelper(row, col, numInRow, currPiece, last);
-         if (col >= NUM_COLS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
+         if (col > NUM_COLS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
       }
@@ -107,7 +129,7 @@ void GameBoard::calcScores() {
       for (int row = 0 ; row < NUM_ROWS ; row++) {
          if (row == NUM_ROWS- 1) last = true;
          calcScoresHelper(row, col, numInRow, currPiece, last);
-         if (row >= NUM_ROWS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
+         if (row > NUM_ROWS - 4 && numInRow == 1) { // no need to keep searching this row, cant get more points
             break;
          }
       }
@@ -156,7 +178,7 @@ void GameBoard::calcScores() {
  * @param last boolean value dictating if it is the last cell in its row/column/diagonal
  */
 void GameBoard::calcScoresHelper(int row, int column, int& numInRow, Pieces& prevPiece, bool last) {
-   Pieces currPiece = this->columns[column]->at(row);
+   Pieces currPiece = this->columns[column][row];
    if (currPiece != Pieces::NONE && currPiece == prevPiece) { // there are at least 2 pieces in a row
       numInRow++;
          // cout << column << ',' << row << ": " << numInRow << endl;
@@ -185,12 +207,14 @@ void GameBoard::calcScoresHelper(int row, int column, int& numInRow, Pieces& pre
 void GameBoard::printBoard() {
    for (int row = 0 ; row < NUM_ROWS ; row++) {
       for (int column = 0 ; column < NUM_COLS ; column++) {
-         if (this->columns[column]->size() < NUM_ROWS - row) { // this spot is empty
+         Pieces piece = this->columns[column][NUM_ROWS - 1 - row];  
+         if (piece == Pieces::NONE) { // this spot is empty
             cout << "O ";
-         }
-         // not empty, print color
-         Pieces piece = this->columns[column]->at(NUM_ROWS - 1 - row);
-         cout << piece << " ";
+         } else if (piece == Pieces::RED) { // this spot is red
+            cout << "R ";
+         } else { // green
+            cout << "G ";
+         } 
       }
       cout << '\n';
    }
@@ -247,19 +271,23 @@ void GameBoard::getUserMove() {
  */
 void GameBoard::insertPiece(Pieces piece, int col) {
    for (int row = 0 ; row < NUM_ROWS ; row++) {
-      if (this->columns[col]->at(row) == Pieces::NONE) {
-         this->columns[col]->at(row) = piece;
+      if (this->columns[col][row] == Pieces::NONE) {
+         this->columns[col][row] = piece;
+         break;
       }
    }
-   redNext = !redNext;
-   numPieces++;
+   this->redNext = !redNext;
+   this->numPieces++;
 }
 
 /**
  * @brief calculates computer's best move using minimax and alpha beta pruning
  */
 void GameBoard::getComputerMove() {
-   minimax(*this, true);
+   int bestMove = minimax(*this, true);
+   Pieces computerPiece = Pieces::GREEN;
+   if (redNext) computerPiece = Pieces::RED;
+   insertPiece(computerPiece, bestMove);
 }
 
 /**
@@ -273,7 +301,7 @@ int GameBoard::minimax(GameBoard state, bool start) {
    int bestMove = -1;
    int bestEval;
 
-   if (state.numPieces == 42) {
+   if (state.maxDepth == 0 || state.getAvailMoves().size() == 0) {
       state.calcScores();
       return state.getScores()[0] - state.getScores()[1]; // red's score - green's score
    }
@@ -293,7 +321,8 @@ int GameBoard::minimax(GameBoard state, bool start) {
       bestEval = 999;
       for (int move : state.getAvailMoves()) {
          GameBoard child = state;
-         child.insertPiece(Pieces::RED, move);
+         child.maxDepth -= 1;
+         child.insertPiece(Pieces::GREEN, move);
          int eval = minimax(child, false);
          if (eval < bestEval) {
             bestMove = move;
@@ -304,4 +333,26 @@ int GameBoard::minimax(GameBoard state, bool start) {
 
    if (start) return bestMove; // parent
    else return bestEval; // children
+}
+
+/**
+ * @brief saves board to file
+ * 
+ * @param file file to save board to
+ */
+void GameBoard::saveBoard(ofstream& file){
+   for (int row = 0 ; row < NUM_ROWS ; row++) {
+      for (int column = 0 ; column < NUM_COLS ; column++) {
+         if (this->columns[column][row] == Pieces::NONE) { // this spot is empty
+            file << "0";
+         } else if (this->columns[column][row] == Pieces::RED) { // this spot is red
+            file << "1";
+         } else { // this spot is green
+            file << "2";
+         }
+      }
+      file << '\n';
+   }
+
+   file << !redNext + 1 << '\n'; // saves 1 if red is next, and 2 if green is next
 }
