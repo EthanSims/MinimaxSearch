@@ -29,7 +29,7 @@ class GameBoard {
       void calcScores();
       void calcScoresHelper(int, int, int&, Pieces&, bool);
       void insertPiece(Pieces, int);
-      int minimax(GameBoard, bool);
+      int minimax(GameBoard, bool, int, int);
    public:
       GameBoard(string, int);
 
@@ -47,7 +47,7 @@ class GameBoard {
 
       void getComputerMove();
 
-      void saveBoard(ofstream&);
+      void saveBoard(string);
 };
 
 #endif

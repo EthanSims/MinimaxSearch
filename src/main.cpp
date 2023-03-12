@@ -19,11 +19,24 @@ using namespace std;
  */
 void runInteractive(GameBoard board, bool humanNext) {
    if(!humanNext) {
-
+      board.printBoard();
+      if (board.getAvailMoves().size() == 0) exit(0);
+      board.getComputerMove();
+      board.saveBoard("computer.txt");
    }
+   while (true) { 
+      board.printBoard();
+      if (board.getAvailMoves().size() == 0) exit(0);
+      board.getUserMove();
+      board.saveBoard("human.txt");
+      board.printBoard();
+      if (board.getAvailMoves().size() == 0) exit(0);
+      board.getComputerMove();
+      board.saveBoard("computer.txt");
+   }  
 }
 
-void runOneMove(GameBoard board, ofstream &outputFile) {
+void runOneMove(GameBoard board, string outputFile) {
    board.printBoard();
    board.getComputerMove();
    board.printBoard();
@@ -61,8 +74,7 @@ int main(int argc, char* argv[]) {
       runInteractive(board, ((string) argv[3]) == "human-next");
    } else { // run one-move mode
       // open outputFile and test its existence
-      ofstream outputFile(argv[3], ofstream::out);
-      runOneMove(board, outputFile);
+      runOneMove(board, argv[3]);
    }
 
    return 0;

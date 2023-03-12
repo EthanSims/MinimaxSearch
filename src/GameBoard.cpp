@@ -205,9 +205,9 @@ void GameBoard::calcScoresHelper(int row, int column, int& numInRow, Pieces& pre
  * @brief prints the current board state
  */
 void GameBoard::printBoard() {
-   for (int row = 0 ; row < NUM_ROWS ; row++) {
+   for (int row = NUM_ROWS - 1; row >= 0 ; row--) {
       for (int column = 0 ; column < NUM_COLS ; column++) {
-         Pieces piece = this->columns[column][NUM_ROWS - 1 - row];  
+         Pieces piece = this->columns[column][row];  
          if (piece == Pieces::NONE) { // this spot is empty
             cout << "O ";
          } else if (piece == Pieces::RED) { // this spot is red
@@ -243,7 +243,7 @@ void GameBoard::getUserMove() {
    // print prompt
    cout << "The available moves are columns: ";
    for (int move : moves) {
-      cout << move << " ";
+      cout << move + 1 << " ";
    }
    cout << endl;
 
@@ -253,6 +253,7 @@ void GameBoard::getUserMove() {
    int userMove;
    while (true) {
       cin >> userMove;
+      userMove--;
       if (find(moves.begin(), moves.end(), userMove) == moves.end()) { // not an option
          cout << "Not an option. Please enter a valid move: ";
       } else {
@@ -284,7 +285,7 @@ void GameBoard::insertPiece(Pieces piece, int col) {
  * @brief calculates computer's best move using minimax and alpha beta pruning
  */
 void GameBoard::getComputerMove() {
-   int bestMove = minimax(*this, true);
+   int bestMove = minimax(*this, true, -999, 999);
    Pieces computerPiece = Pieces::GREEN;
    if (redNext) computerPiece = Pieces::RED;
    insertPiece(computerPiece, bestMove);
@@ -297,7 +298,7 @@ void GameBoard::getComputerMove() {
  * @param start boolean denoting whether this is the start of the search or not
  * @return for all children, returns the best eval, for the parent, returns best move
  */
-int GameBoard::minimax(GameBoard state, bool start) {
+int GameBoard::minimax(GameBoard state, bool start, int alpha, int beta) {
    int bestMove = -1;
    int bestEval;
 
@@ -311,10 +312,16 @@ int GameBoard::minimax(GameBoard state, bool start) {
       for (int move : state.getAvailMoves()) {
          GameBoard child = state;
          child.insertPiece(Pieces::RED, move);
-         int eval = minimax(child, false);
+         int eval = minimax(child, false, alpha, beta);
          if (eval > bestEval) {
             bestMove = move;
             bestEval = eval;
+         }
+         if (bestEval > alpha) {
+            alpha = bestEval;
+         }
+         if (beta <= alpha) {
+            break;
          }
       }
    } else { // minimization player
@@ -323,10 +330,16 @@ int GameBoard::minimax(GameBoard state, bool start) {
          GameBoard child = state;
          child.maxDepth -= 1;
          child.insertPiece(Pieces::GREEN, move);
-         int eval = minimax(child, false);
+         int eval = minimax(child, false, alpha, beta);
          if (eval < bestEval) {
             bestMove = move;
             bestEval = eval;
+         }
+         if (bestEval < beta) {
+            beta = bestEval;
+         }
+         if (beta <= alpha) {
+            break;
          }
       }
    }
@@ -340,8 +353,9 @@ int GameBoard::minimax(GameBoard state, bool start) {
  * 
  * @param file file to save board to
  */
-void GameBoard::saveBoard(ofstream& file){
-   for (int row = 0 ; row < NUM_ROWS ; row++) {
+void GameBoard::saveBoard(string filename) {
+   ofstream file(filename);
+   for (int row = NUM_ROWS - 1 ; row >= 0 ; row--) {
       for (int column = 0 ; column < NUM_COLS ; column++) {
          if (this->columns[column][row] == Pieces::NONE) { // this spot is empty
             file << "0";
