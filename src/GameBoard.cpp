@@ -136,7 +136,7 @@ void GameBoard::calcScores() {
    }
 
    // get diagonal scores (up-right)
-   for (int i = NUM_ROWS - 4 ; i >= -NUM_ROWS + 4 ; i--) {
+   for (int i = NUM_ROWS - 4 ; i >= -NUM_COLS + 4 ; i--) {
       last = false;
       currPiece = Pieces::NONE;
       for (int col = 0 ; col < NUM_COLS; col++) {
@@ -152,7 +152,7 @@ void GameBoard::calcScores() {
    }
 
    // get diagonal scores (down-right)
-   for (int i = NUM_ROWS + 4 ; i >= 4 ; i--) {
+   for (int i = NUM_ROWS + 2 ; i >= 3 ; i--) {
       last = false;
       currPiece = Pieces::NONE;
       for (int col = 0 ; col < NUM_COLS ; col++) {
@@ -205,6 +205,15 @@ void GameBoard::calcScoresHelper(int row, int column, int& numInRow, Pieces& pre
  * @brief prints the current board state
  */
 void GameBoard::printBoard() {
+   cout << "Last move: ";
+   if (this->numPieces == 0) {
+      cout << "None\n";
+   } else if (this->redNext) {
+      cout << "Green\n";
+   } else {
+      cout << "Red\n";
+   }
+
    for (int row = NUM_ROWS - 1; row >= 0 ; row--) {
       for (int column = 0 ; column < NUM_COLS ; column++) {
          Pieces piece = this->columns[column][row];  
@@ -219,7 +228,9 @@ void GameBoard::printBoard() {
       cout << '\n';
    }
 
-   cout << "Moves made so far: " << this->numPieces << endl;
+   cout << "Score: " << this->scores[0] << "(R) - " << this->scores[1] << "(G)\n";
+
+   cout << "\nMoves made so far: " << this->numPieces << endl;
 }
 
 /**
@@ -279,6 +290,7 @@ void GameBoard::insertPiece(Pieces piece, int col) {
    }
    this->redNext = !redNext;
    this->numPieces++;
+   this->calcScores();
 }
 
 /**

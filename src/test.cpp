@@ -31,7 +31,9 @@ int main() {
    // test red's score (vertical and diagonal up-right)
    cout << "Expected: 13, Actual: " << board.getScores()[0] << endl;
 
-   board = GameBoard("test2.txt", 1);
+   board = GameBoard("test3.txt", 1);
+   cout << "Expected: 0, Actual: " << board.getScores()[0] << endl;
+   cout << "Expected: 2, Actual: " << board.getScores()[1] << endl;
 
    return 0;
 }
