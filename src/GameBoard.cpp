@@ -109,6 +109,8 @@ void GameBoard::calcScores() {
    Pieces currPiece;
    int numInRow;
    bool last;
+   this->scores[0] = 0;
+   this->scores[1] = 0;
 
    // get horizontal scores
    for (int row = 0 ; row < NUM_ROWS ; row++) {
