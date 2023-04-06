@@ -2,7 +2,9 @@ Author: Ethan Sims, ea.sims@me.com
 
 This project was a school assignment from the Colorado School of Mines CSCI404 course.
 
-The goal of this project was to implement a depth-limited minimax Search algorithm with alpha-beta pruning using an input map formatted properly in a txt file.
+The goal of this project was to implement a depth-limited minimax Search algorithm with alpha-beta pruning for connect 4 using an input map formatted properly in a txt file.
+
+Game: The game is a version of connect 4 where the number of 4's in a row translates to a number of points. The game terminates when the board is full.
 
 Command-line input format
   Interactive Mode: ./maxconnect4.exe interactive [input_file] [computer-next/human-next] [depth]
