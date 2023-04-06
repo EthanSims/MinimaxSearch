@@ -13,9 +13,8 @@ using namespace std;
 /**
  * @brief runs interactive mode of program (human and computer take turns)
  * 
- * @param inputFile filestream for file containing original board state
- * @param DEPTH depth of search (how many moves ahead to look)
- * @param humanNext boolean value denoting if it is the human's turn
+ * @param board board to play on
+ * @param humanNext true if human player is next, false if computer is next
  */
 void runInteractive(GameBoard board, bool humanNext) {
    if(!humanNext) {
@@ -36,6 +35,12 @@ void runInteractive(GameBoard board, bool humanNext) {
    }  
 }
 
+/**
+ * @brief runs one move mode
+ * 
+ * @param board board to play on
+ * @param outputFile name of file to write output to
+ */
 void runOneMove(GameBoard board, string outputFile) {
    board.printBoard();
    board.getComputerMove();
@@ -68,7 +73,7 @@ int main(int argc, char* argv[]) {
       return -1;
    }
 
-   GameBoard board(argv[2], atoi(argv[4]));
+   GameBoard board(argv[2], atoi(argv[4])); // makes new board with given input file and depth of search
 
    if (((string) argv[1]) == "interactive") { // run interactive mode
       runInteractive(board, ((string) argv[3]) == "human-next");

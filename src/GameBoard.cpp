@@ -13,7 +13,8 @@ using namespace std;
 /**
  * @brief Construct a new Game Board object
  * 
- * @param input filestream to read initial state from
+ * @param filename name of file to use as input
+ * @param depth max depth of search on this board
  */
 GameBoard::GameBoard(string filename, int depth) {
    ifstream input = ifstream(filename);
@@ -102,7 +103,7 @@ int GameBoard::getNumPieces() {
 }
 
 /**
- * @brief gets the scores for red and green (scores[0] is red, scores[1] is green)
+ * @brief calculates the scores for red and green (scores[0] is red, scores[1] is green)
  */
 void GameBoard::calcScores() {
    Pieces currPiece;
@@ -181,8 +182,6 @@ void GameBoard::calcScoresHelper(int row, int column, int& numInRow, Pieces& pre
    Pieces currPiece = this->columns[column][row];
    if (currPiece != Pieces::NONE && currPiece == prevPiece) { // there are at least 2 pieces in a row
       numInRow++;
-         // cout << column << ',' << row << ": " << numInRow << endl;
-
    } 
    
    if (currPiece != prevPiece || last) { // end of row or end of streak
@@ -308,6 +307,8 @@ void GameBoard::getComputerMove() {
  * 
  * @param state current board state
  * @param start boolean denoting whether this is the start of the search or not
+ * @param alpha alpha used in alpha-beta search
+ * @param beta beta used in alpha-beta search
  * @return for all children, returns the best eval, for the parent, returns best move
  */
 int GameBoard::minimax(GameBoard state, bool start, int alpha, int beta) {
@@ -363,7 +364,7 @@ int GameBoard::minimax(GameBoard state, bool start, int alpha, int beta) {
 /**
  * @brief saves board to file
  * 
- * @param file file to save board to
+ * @param filename name of file to save board to
  */
 void GameBoard::saveBoard(string filename) {
    ofstream file(filename);
