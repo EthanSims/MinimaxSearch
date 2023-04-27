@@ -268,6 +268,8 @@ void GameBoard::getUserMove() {
       userMove--;
       if (find(moves.begin(), moves.end(), userMove) == moves.end()) { // not an option
          cout << "Not an option. Please enter a valid move: ";
+         std::cin.clear();
+         std::cin.ignore(90, '\n');
       } else {
          break;
       }
